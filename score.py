@@ -2,7 +2,7 @@ import json
 import tqdm
 import pandas as pd
 
-from fever.bge.load_fever_dataset import load_fever_dataset_exclude_NEI
+from load_fever_dataset import load_fever_dataset_exclude_NEI
 from utils.load_data import find_text_by_ids
 
 # import ids from wiki dumps
@@ -34,8 +34,8 @@ from utils.load_data import find_text_by_ids
 # print(find_text_by_ids('Murda_Beatz'))
 
 top_evidenct_amount = 10
-evidence_df = pd.read_csv('fever/bge/devset_evidence_rerank_10.csv')
-devset_df = load_fever_dataset_exclude_NEI('fever/devset/shared_task_dev.jsonl')
+evidence_df = pd.read_csv('devset_evidence_rerank_10_large.csv')
+devset_df = load_fever_dataset_exclude_NEI('shared_task_dev.jsonl')
 
 data_length = len(evidence_df)
 total_match = 0

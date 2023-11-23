@@ -6,7 +6,7 @@ from utils.load_data import find_text_by_ids, random_get_texts_exclude_ids
 # Load the dataset once
 dataset = load_fever_dataset_exclude_NEI('train.jsonl')
 
-data_length = len(dataset[:10000])
+data_length = len(dataset[:100000])
 reranker_trainset_data = []
 
 neg_texts_amount = 7

@@ -178,3 +178,10 @@ pyrightconfig.json
 wiki-pages*
 devset_evidence*
 train.jsonl
+large_model/*
+model/*
+fever/*
+result/*
+dataset/*
+__MACOSX/._license.html
+__MACOSX/._wiki-pages

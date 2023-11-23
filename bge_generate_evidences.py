@@ -7,13 +7,14 @@ import tqdm
 import sys 
 
 from cal_embedding_bge import get_embeddings
-from fever.bge.load_fever_dataset import load_fever_dataset_exclude_NEI
+from load_fever_dataset import load_fever_dataset_exclude_NEI, load_fever_dataset_include_NEI, load_fever_dataset
 
 # client = client = chromadb.PersistentClient(path="fever/chroma_fever")
 # collection = client.get_collection("fever_full")
 # vectorstore = collection.get()
 
-dev_df = load_fever_dataset_exclude_NEI('fever/devset/shared_task_dev.jsonl')
+# dev_df = load_fever_dataset_include_NEI('dataset/shared_task_dev.jsonl')
+dev_df = load_fever_dataset('dataset/shared_task_test.jsonl')
 
 vectorstore = Chroma("fever_full",persist_directory='fever/chroma_fever',embedding_function=get_embeddings())
 
@@ -35,7 +36,7 @@ for i in tqdm.tqdm(range(len(dev_df))):
         documents = vectorstore.similarity_search_with_relevance_scores(claim, k=top_evidenct_amount)
         for j, (doc, score) in enumerate(documents):
             # print('document',j,score,doc)
-            row['evi'+str(j+1)] = doc.page_content
+            row['evi'+str(j+1)] = doc.metadata['ids']
     result = pd.concat([result, pd.DataFrame([row])], ignore_index=True)
 
-result.to_csv('fever/bge/devset_evidence.csv',index=False)
+result.to_csv('result/testset_evidence_100.csv',index=False)
