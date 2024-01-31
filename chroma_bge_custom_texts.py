@@ -1,26 +1,94 @@
 import json
 import tqdm
 # from cal_embedding import calculate_embedding
-from cal_embedding_bge import calculate_docs_embedding
+from cal_embedding_bge_en import calculate_docs_embedding, get_embeddings
+from cal_embedding_bge_zh import calculate_docs_embedding_zh, get_embeddings_zh
+
 from langchain.vectorstores.chroma import Chroma
 import chromadb
-from cal_embedding_bge import get_embeddings
+from chromadb.config import Settings
 
-def get_similar_texts_top_k(texts_list, claim, k):
+from fastapi import FastAPI, HTTPException, Body
+from crawler import url_to_text
+import requests
+
+app = FastAPI()
+
+@app.post("/get_top_k_evidences")
+async def get_top_k_evidences(data: dict = Body(...)):
+    try:
+        url_list = data['url_list']
+        claim = data['claim']
+        k = data['k']
+        lang = data['lang']
+
+        verify_result_json = verify_with_crawler(url_list, claim, k, lang)
+        return verify_result_json
+    
+    except KeyError as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+def verify_with_crawler(url_list:list, claim:str, k:int, lang='en'):
+    ranked_urls = get_similar_urls_top_k(url_list, claim, k, lang)
+    verify_result = everify(ranked_urls, claim, lang)
+    weighted_verify_result = _rank_verify_evidences(verify_result)
+    return weighted_verify_result
+
+def _rank_verify_evidences(verify_result):
+    # label 0:support, 1:refuted, 2:NEI
+    weighted_verify_result = {}
+    for i, verify in enumerate(verify_result):
+        if verify['label'] == 2:
+            continue
+        else:
+            weighted_verify_result['verify'] = verify['label']
+            weighted_verify_result['evi_index'] = i
+            break
+    
+    if 'verify' not in weighted_verify_result:
+        weighted_verify_result['verify'] = 2
+
+    weighted_verify_result['resources'] = verify_result
+    return weighted_verify_result
+
+def get_similar_urls_top_k(urls_list, claim, k, lang):
+    texts_list = []
+    for url in tqdm.tqdm(urls_list, desc='crawling'):
+        text = url_to_text(url,mode='direct')
+        texts_list.append(text)
+
+    ranked_texts = get_similar_texts_top_k(texts_list, claim, k, lang)
+    ranking = [texts_list.index(ranked_text[0]) for ranked_text in ranked_texts]
+    ranked_urls = [urls_list[i] for i in ranking]
+
+    return ranked_urls
+
+def get_similar_texts_top_k(texts_list, claim, k, lang):
 
     if k >= len(texts_list):
         return None
+    
+    if lang == 'en':
+        get_embeddings_function = get_embeddings
+        calculate_docs_embedding_function = calculate_docs_embedding
+    elif lang == 'zh':
+        get_embeddings_function = get_embeddings_zh
+        calculate_docs_embedding_function = calculate_docs_embedding_zh
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported")
 
-    client = chromadb.Client()
-    collection = client.create_collection("evidence_extraction")
+    client = chromadb.Client(settings=Settings(allow_reset=True))
+    client.reset()
+    collection = client.get_or_create_collection("evidence_extraction")
     embeddings_list = []
 
-    for texts in tqdm.tqdm(texts_list):
+    for texts in tqdm.tqdm(texts_list, desc='select docs'):
 
         embeddings = None
         for _ in range(3): # max retry = 3
             # embeddings = calculate_embedding(text)
-            embeddings = calculate_docs_embedding([texts])
+            embeddings = calculate_docs_embedding_function([texts])
             if embeddings:
                 break
 
@@ -32,17 +100,34 @@ def get_similar_texts_top_k(texts_list, claim, k):
         embeddings=embeddings_list
     )
 
-    vectorstore = Chroma(client=client, embedding_function=get_embeddings(), collection_name="evidence_extraction")
+    vectorstore = Chroma(client=client, embedding_function=get_embeddings_function(), collection_name="evidence_extraction")
     documents = vectorstore.similarity_search_with_relevance_scores(claim, k=k)
     ans = []
     for (doc, score) in documents:
-        ans.append((doc.metadata['ids'], score)) 
+        ans.append((doc.page_content, score)) 
     return ans
 
+def everify(ranked_urls, claim, lang='en') -> list:
+    print('call verify API')
+    verify_result = []
+    for url in ranked_urls:
+        if lang == 'en':
+            web = requests.get(f"http://140.115.54.36/everify/?claim={claim}&url={url}")
+        elif lang == 'zh':
+            web = requests.get(f"http://140.115.54.36/cverify2/?claim={claim}&url={url}")
+        verify_json = web.json()
+        verify_json['url'] = url
+        verify_result.append(verify_json)
+    return verify_result
+
 if __name__ == '__main__':
-    texts = ['“DQN之前：曾经有一段时间大家普遍认为online的TD方法只有在on-policy情况下才有收敛性保证。而off-policy方法（如Q-learning）虽然在tabular情况下可以保证收敛，但是在有linear FA情况下就无法保证收敛。而least-squares方法（如LSTD, LSPI）虽能解决off-policy和linear FA下的收敛性问题，但计算复杂度比较高。Sutton和Maei等人提出的GTD（Gradient-TD）系方法（如Greedy-GQ）解决了off-policy，FA，online算法的收敛性问题。它最小化目标MSPBE（mean-squared projected Bellman error），通过SGD优化求解。但因为它仍是TD方法，因此仍然逃不了TD方法在上面提到的固有缺点。要避免这些缺点，一般的做法是用PG算法（如AC算法）。在Degris等人的论文《Off-Policy Actor-Critic》中将AC算法扩展到off-policy场景，提出了OffPAC算法，它是一种online, off-policy的AC算法。 OffPAC中的critic部分采用了上面提到的GTD系方法-GTD(λ)算法。','DQN之后：传统经验认为，online的RL算法在和DNN简单结合后会不稳定。主要原因是观察数据往往波动很大且前后sample相互关联。像Neural fitted Q iteration和TRPO方法通过将经验数据batch，或者像DQN中通过experience replay memory对之随机采样，这些方法有效解决了前面所说的两个问题，但是也将算法限定在了off-policy方法中。本文提出了另一种思路，即通过创建多个agent，在多个环境实例中并行且异步的执行和学习。于是，通过这种方式，在DNN下，解锁了一大批online/offline的RL算法（如Sarsa, AC, Q-learning）。”','转自： 深度增强学习（DRL）漫谈 - 从AC（Actor-Critic）到A3C（Asynchronous Advantage Actor-Critic）','Rich Sutton的书里不是给了个例子说明on policy为啥不好么。']
-    claim = 'DQN之前'
-    k = 3
-    print(get_similar_texts_top_k(texts, claim, k))
+    urls = [
+        'https://zh.wikipedia.org/zh-tw/%E8%94%A1%E8%8B%B1%E6%96%87',
+        'https://www.president.gov.tw/Page/40',
+        'https://www.president.gov.tw/Page/249'
+    ]
+    claim = '中華民國總統是蔡英文'
+    k = 2
+    print(verify_with_crawler(urls, claim, k, lang='zh'))
         
         

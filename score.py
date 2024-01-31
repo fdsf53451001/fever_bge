@@ -3,7 +3,7 @@ import tqdm
 import pandas as pd
 
 from load_fever_dataset import load_fever_dataset_exclude_NEI
-from utils.load_data import find_text_by_ids
+# from utils.load_data import find_text_by_ids
 
 # import ids from wiki dumps
 # data = {}
@@ -34,8 +34,8 @@ from utils.load_data import find_text_by_ids
 # print(find_text_by_ids('Murda_Beatz'))
 
 top_evidenct_amount = 10
-evidence_df = pd.read_csv('devset_evidence_rerank_10_large.csv')
-devset_df = load_fever_dataset_exclude_NEI('shared_task_dev.jsonl')
+evidence_df = pd.read_csv('result/devset_evidence_10_wikiapi.csv')
+devset_df = load_fever_dataset_exclude_NEI('dataset/shared_task_dev.jsonl')
 
 data_length = len(evidence_df)
 total_match = 0
@@ -52,17 +52,27 @@ for i in tqdm.tqdm(range(data_length),desc='scoring'):
     correct_predict_evidence_amount = 0
     for k in range(evidence_amount):
         true_evidence_idx = true_evidence[k][0][2]
-        true_evidence_sentence = find_text_by_ids(true_evidence_idx)
-        if not true_evidence_sentence:
-            missing_wiki_sentence += 1
-            continue
+        # true_evidence_sentence = find_text_by_ids(true_evidence_idx)
+        # if not true_evidence_sentence:
+        #     missing_wiki_sentence += 1
+        #     continue
 
         for j in range(1,top_evidenct_amount+1):
             get_evidence = evidence_row['evi'+str(j)]
             # print(i,k,j,get_evidence)
-            if get_evidence and true_evidence_sentence in get_evidence:
-                correct_predict_evidence_amount += 1
-                break
+            if get_evidence and not pd.isna(get_evidence):
+                
+                # the respond title of wiki api likes "Murda Beatz" is not the same as the title in wiki dump, replace space with _ to match the title in wiki dump
+                # turn this on with the wiki api
+                replace_space = True
+
+                if replace_space:
+                    get_evidence = get_evidence.replace(' ','_').replace('(','-LRB-').replace(')','-RRB-')
+
+                # true_evidence_sentence
+                if true_evidence_idx in get_evidence:
+                    correct_predict_evidence_amount += 1
+                    break
     if correct_predict_evidence_amount == evidence_amount:
         total_match += 1
     elif correct_predict_evidence_amount > 0:

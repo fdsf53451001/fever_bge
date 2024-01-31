@@ -1,7 +1,7 @@
 import json
 import tqdm
 # from cal_embedding import calculate_embedding
-from cal_embedding_bge import calculate_docs_embedding
+from cal_embedding_bge_en import calculate_docs_embedding
 import chromadb
 
 client = chromadb.PersistentClient(path="fever/chroma_fever")

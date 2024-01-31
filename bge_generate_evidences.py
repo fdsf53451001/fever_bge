@@ -6,7 +6,7 @@ import pandas as pd
 import tqdm
 import sys 
 
-from cal_embedding_bge import get_embeddings
+from cal_embedding_bge_en import get_embeddings
 from load_fever_dataset import load_fever_dataset_exclude_NEI, load_fever_dataset_include_NEI, load_fever_dataset
 
 # client = client = chromadb.PersistentClient(path="fever/chroma_fever")
