@@ -183,5 +183,7 @@ model/*
 fever/*
 result/*
 dataset/*
+temp/*
+verify/dataset/*
 __MACOSX/._license.html
 __MACOSX/._wiki-pages
