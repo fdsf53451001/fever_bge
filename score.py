@@ -3,38 +3,10 @@ import tqdm
 import pandas as pd
 
 from load_fever_dataset import load_fever_dataset_exclude_NEI
-# from utils.load_data import find_text_by_ids
-
-# import ids from wiki dumps
-# data = {}
-# for page_index in tqdm.tqdm(range(1,110),desc='load wiki data'): #110
-#     file_i = str(page_index).zfill(3)
-
-#     file = open("fever/wiki-pages/wiki-"+file_i+".jsonl", "r")
-#     page_data = file.readlines()
-#     file.close()
-
-#     for sentence_index, json_str in enumerate(page_data[1:]):
-#         item = json.loads(json_str)
-#         id = item.get("id")
-#         if not id:
-#             continue
-#         data[id] = (file_i,sentence_index+1)
-
-# def find_text_by_ids(ids):
-#     if ids not in data:
-#         return None
-#     (file_i, sentence_index) = data[ids]
-#     file = open("fever/wiki-pages/wiki-"+file_i+".jsonl", "r")
-#     page_data = file.readlines()
-#     file.close()
-#     item = json.loads(page_data[sentence_index])
-#     return item.get('text')
-
-# print(find_text_by_ids('Murda_Beatz'))
 
 top_evidenct_amount = 10
-evidence_df = pd.read_csv('result/devset_evidence_10_wikiapi.csv')
+MAX_EVIDENCE_DOC_AMOUNT = 3
+evidence_df = pd.read_csv('devset_evidence_rerank_10.csv')
 devset_df = load_fever_dataset_exclude_NEI('dataset/shared_task_dev.jsonl')
 
 data_length = len(evidence_df)
@@ -48,7 +20,8 @@ for i in tqdm.tqdm(range(data_length),desc='scoring'):
     devset_row = devset_df[devset_df['id']==id]
     true_evidence = list(devset_row['evidence'])[0]
     
-    evidence_amount = len(true_evidence)
+    evidence_amount = len(true_evidence) if len(true_evidence) < MAX_EVIDENCE_DOC_AMOUNT else MAX_EVIDENCE_DOC_AMOUNT
+
     correct_predict_evidence_amount = 0
     for k in range(evidence_amount):
         true_evidence_idx = true_evidence[k][0][2]

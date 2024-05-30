@@ -1,11 +1,12 @@
 import tqdm
 import json
 import random
-import linecache
+import re
 
 # import ids from wiki dumps
 data = {}
-def load_wiki_pages(s_index=1, e_index=110):
+def load_wiki_pages(s_index=1, e_index=110) -> dict:
+    tmp = {}
     for page_index in tqdm.tqdm(range(s_index,e_index),desc='load wiki data'): #110
         file_i = str(page_index).zfill(3)
 
@@ -19,27 +20,20 @@ def load_wiki_pages(s_index=1, e_index=110):
             text = item.get("text")
             if not id or not text:
                 continue
-            data[id] = (file_i,sentence_index+1,text)
-    print('load wiki data done, total size:',len(data))
+            tmp[id] = (file_i,sentence_index+1,text)
+    print('load wiki data done, total size:',len(tmp))
+    return tmp
 
 # load_wiki_pages(1,2)
-load_wiki_pages(1,110)
+data = load_wiki_pages(1,110)
 
 keys_list = list(data.keys())
+keys_list_lowercase = [k[0]+k[1:].lower() for k in keys_list]
 
 def find_text_by_ids(ids):
     if ids not in data:
         return None
     (file_i, sentence_index, text) = data[ids]
-
-    # file = open("fever/wiki-pages/wiki-"+file_i+".jsonl", "r")
-    # row_json = file.readlines()[sentence_index]
-    # file.close()
-
-    # row_json = linecache.getline("fever/wiki-pages/wiki-"+file_i+".jsonl", sentence_index+1)
-
-    # item = json.loads(row_json)
-    # text = item.get('text')
 
     return text
 
@@ -56,6 +50,13 @@ def random_get_texts_exclude_ids(amount:int, ids:list):
         random_texts.append(random_text)
     return random_texts
 
+def search_ids_by_keyword(keyword:str, amount=3) -> list:
+    search_list = []
+    keyword = keyword[0] + keyword[1:].lower()
+    for i, key in enumerate(keys_list_lowercase):
+        if keyword in key:            
+            search_list.append(keys_list[i])
+    return search_list[:amount]
 
 if __name__ == '__main__':
     print(find_text_by_ids('1928_in_association_football'))

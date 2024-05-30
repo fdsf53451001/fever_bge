@@ -14,9 +14,9 @@ from load_fever_dataset import load_fever_dataset_exclude_NEI, load_fever_datase
 # vectorstore = collection.get()
 
 # dev_df = load_fever_dataset_include_NEI('dataset/shared_task_dev.jsonl')
-dev_df = load_fever_dataset('dataset/shared_task_test.jsonl')
+dev_df = load_fever_dataset('dataset/shared_task_dev.jsonl')
 
-vectorstore = Chroma("fever_full",persist_directory='fever/chroma_fever',embedding_function=get_embeddings())
+vectorstore = Chroma("fever_full",persist_directory='fever/chroma_fever5',embedding_function=get_embeddings())
 
 evidence_list = []
 top_evidenct_amount = 100
@@ -39,4 +39,4 @@ for i in tqdm.tqdm(range(len(dev_df))):
             row['evi'+str(j+1)] = doc.metadata['ids']
     result = pd.concat([result, pd.DataFrame([row])], ignore_index=True)
 
-result.to_csv('result/testset_evidence_100.csv',index=False)
+result.to_csv('doc_eval/result/devset_evidence_v5_100.csv',index=False)

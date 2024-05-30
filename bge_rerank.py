@@ -26,7 +26,7 @@ def rerank(query, sentences):
 # sentences = ['hi', 'The giant panda (Ailuropoda melanoleuca), sometimes called a panda bear or simply panda, is a bear species endemic to China.']
 # print(rerank(query, sentences))
 
-evidence_df = pd.read_csv('result/testset_evidence_100.csv')
+evidence_df = pd.read_csv('result/trainset_evidence_100.csv')
 data_length = len(evidence_df)
 top_evidenct_amount = 100
 save_top_evidenct_amount = 10
@@ -53,6 +53,6 @@ for i in tqdm.tqdm(range(data_length),desc='reranking'):
         row['evi'+str(j+1)] = top_evidences[j]
     result = pd.concat([result, pd.DataFrame([row])], ignore_index=True)
 
-result.to_csv('result/testset_evidence_rerank_10.csv',index=False)
+result.to_csv('result/trainset_evidence_rerank_10.csv',index=False)
 
 

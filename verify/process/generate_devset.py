@@ -14,24 +14,26 @@ def split_lines(lines):
     return result
 
 # read jsonl file
-with open('verify/dataset/train_golden.jsonl', 'r') as f:
+with open('verify/dataset/shared_task_dev.jsonl', 'r') as f:
     data = f.readlines()
 
 evidence_missing = 0
-with open('verify/dataset/created/train_processed_NEI.jsonl', 'w') as f:
+with open('verify/dataset/dev_processed.jsonl', 'w') as f:
     for row in tqdm.tqdm(data[:]):
         row = json.loads(row)
 
-        if row['label'] != 'NOT ENOUGH INFO':
-            continue
-
         label = row['label']
         claim = row['claim']
-        evidence_lines = row['evidence']
+        evidence_lines = row['evidence_match_lines']
 
         evidences = []
-        for evidence_line in evidence_lines:            
-            evidences.append(evidence_line[2])
+        for evidence_line in evidence_lines:
+            evidence_doc_split = split_lines(evidence_line[2])
+            if evidence_line[2] == '' or evidence_line[1]>=len(evidence_doc_split):
+                evidence_missing += 1
+                continue
+            line_texts = evidence_doc_split[evidence_line[1]]
+            evidences.append(line_texts)
         
         row_processed = {'label': label, 'claim': claim, 'evidence': evidences}
         

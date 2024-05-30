@@ -2,7 +2,7 @@ from langchain.embeddings import HuggingFaceBgeEmbeddings
 import numpy as np
 
 model_name = 'BAAI/bge-large-zh-v1.5'
-model_kwargs = {'device':'cuda:1'}
+model_kwargs = {'device':'cuda'}
 encode_kwargs = {'normalize_embeddings':True}
 model = HuggingFaceBgeEmbeddings(
     model_name = model_name,

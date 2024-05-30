@@ -179,11 +179,17 @@ wiki-pages*
 devset_evidence*
 train.jsonl
 large_model/*
+output/*
 model/*
 fever/*
 result/*
 dataset/*
 temp/*
 verify/dataset/*
+FlagEmbedding/*
 __MACOSX/._license.html
 __MACOSX/._wiki-pages
+claim_process/stanford*
+doc_eval/result
+doc_models/
+generate_trainset/trainset/

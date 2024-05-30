@@ -1,16 +1,17 @@
 from langchain.embeddings import HuggingFaceBgeEmbeddings
 import numpy as np
 
-model_name = 'BAAI/bge-large-en-v1.5'
-model_kwargs = {'device':'cuda:1'}
+model_name = './output'
+model_kwargs = {'device':'cuda'}
 encode_kwargs = {'normalize_embeddings':True}
 model = HuggingFaceBgeEmbeddings(
     model_name = model_name,
     model_kwargs = model_kwargs,
     encode_kwargs = encode_kwargs,
-    # query_instruction="Represent this sentence for searching relevant passages:"
+    query_instruction=""
 )
 
+# Represent this sentence for searching relevant passages:
 def get_embeddings():
     return model
 

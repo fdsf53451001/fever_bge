@@ -4,10 +4,11 @@ import tqdm
 from cal_embedding_bge_en import calculate_docs_embedding
 import chromadb
 
-client = chromadb.PersistentClient(path="fever/chroma_fever")
+client = chromadb.PersistentClient(path="fever/chroma_fever5")
+# client = chromadb.HttpClient(host='140.115.54.35', port=8000)
 
-# collection = client.create_collection("fever_full")
-collection = client.get_collection("fever_full")
+collection = client.create_collection("fever_full")
+# collection = client.get_collection("fever_full")
 
 for i in range(1,110): #96
     file_i = str(i).zfill(3)
