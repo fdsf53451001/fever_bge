@@ -3,7 +3,7 @@ import re
 from tqdm import tqdm
 
 
-pred_file = open('doc_eval/result/devset_evidence_kw_v2.jsonl', 'r', encoding='utf-8')
+pred_file = open('doc_eval/result/devset_evidence_rerank_20.jsonl', 'r', encoding='utf-8')
 gold_file = open('doc_eval/result/devset_doc_gold.jsonl', 'r', encoding='utf-8')
 
 
@@ -17,12 +17,13 @@ c = 0
 f = 0
 
 for pred, gold in tqdm(zip(pred_file, gold_file), desc='Evaluating'):
-    pred_evidences = eval(pred)['evidences']
+    pred_evidences = eval(pred)['evidences'][:5]
     gold_evidences = eval(gold)['documents']
     tp = 0
     for pred in pred_evidences:
+        # pred = pred.replace(' ','_').replace('(','-LRB-').replace(')','-RRB-')
         if pred in gold_evidences:
-            tp += 1
+            tp += 1 
     c += tp
     f += len(pred_evidences)
     if len(pred_evidences)==0 and len(gold_evidences)!=0:
@@ -57,4 +58,4 @@ print("Precision: {:.2%}".format(precision))
 print("   Recall: {:.2%}".format(recall))
 print("       F1: {:.2%}".format(f1))
 print("len_pred:",sum(len_pred) / len(len_pred))
-print("len_gold:",sum(len_gold) / len(len_gold))
+print("len_gold: ",sum(len_gold) / len(len_gold))

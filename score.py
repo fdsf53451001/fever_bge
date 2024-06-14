@@ -5,8 +5,8 @@ import pandas as pd
 from load_fever_dataset import load_fever_dataset_exclude_NEI
 
 top_evidenct_amount = 10
-MAX_EVIDENCE_DOC_AMOUNT = 3
-evidence_df = pd.read_csv('devset_evidence_rerank_10.csv')
+MAX_EVIDENCE_DOC_AMOUNT = 10
+evidence_df = pd.read_csv('doc_eval/result/devset_evidence_rerank_10.csv')
 devset_df = load_fever_dataset_exclude_NEI('dataset/shared_task_dev.jsonl')
 
 data_length = len(evidence_df)
@@ -18,6 +18,9 @@ for i in tqdm.tqdm(range(data_length),desc='scoring'):
     evidence_row = evidence_df.iloc[i]
     id = evidence_row['id']
     devset_row = devset_df[devset_df['id']==id]
+    if not len(devset_row):
+        data_length -= 1
+        continue
     true_evidence = list(devset_row['evidence'])[0]
     
     evidence_amount = len(true_evidence) if len(true_evidence) < MAX_EVIDENCE_DOC_AMOUNT else MAX_EVIDENCE_DOC_AMOUNT
@@ -37,7 +40,7 @@ for i in tqdm.tqdm(range(data_length),desc='scoring'):
                 
                 # the respond title of wiki api likes "Murda Beatz" is not the same as the title in wiki dump, replace space with _ to match the title in wiki dump
                 # turn this on with the wiki api
-                replace_space = True
+                replace_space = False
 
                 if replace_space:
                     get_evidence = get_evidence.replace(' ','_').replace('(','-LRB-').replace(')','-RRB-')
