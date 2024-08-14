@@ -21,7 +21,8 @@ use bge embedding and reranker to do sentence retrivel for fever dataset
 - `train_reg` 和 `train_3cls` 分別代表 Regressor 和 3 分類 Classifier(NLI task) 的訓練集，2 分類 Classifier 同樣使用 `train_reg` 訓練。  
 - `train_contrastive` 是對比學習的訓練集。  
 - `dev_gold_doc` 和 `dev_10doc` 都可用來測試模型的效能，差別在黃金文檔或是文檔檢索取回的 10 個文檔，它們與 `dev_gold_evi` 比對。  
-> tips: 觀察不同訓練方法的 label 並比對他們的 loss function
+> tips: 觀察不同訓練方法的 label 並比對他們的 loss function  
+- 可先在 `evidence_retrieval` 底下新增 `checkpoint`、`Data`、`output` 共三個資料夾，`FlagEmbedding` 底下新增 `checkpoint`、`Data` 資料夾。
 
 ## 執行流程
 1. 訓練模型並取得 Checkpoint。  
