@@ -2,7 +2,7 @@ import json
 import tqdm
 import pandas as pd
 
-from load_fever_dataset import load_fever_dataset_exclude_NEI
+from ..utils.load_fever_dataset import load_fever_dataset_exclude_NEI
 
 top_evidenct_amount = 10
 MAX_EVIDENCE_DOC_AMOUNT = 10

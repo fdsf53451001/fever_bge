@@ -2,7 +2,7 @@ import tqdm
 import pandas as pd
 import sys
 sys.path.append("/home/jovyan/fever_bge")
-from load_fever_dataset import load_fever_dataset_exclude_NEI
+from utils.load_fever_dataset import load_fever_dataset_exclude_NEI
 from utils.load_data import find_text_by_ids
 # from utils.load_data import random_get_texts_exclude_ids
 

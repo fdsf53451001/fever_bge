@@ -9,7 +9,7 @@ import requests
 import time
 from typing import Tuple
 
-from load_fever_dataset import load_fever_dataset_exclude_NEI, load_fever_dataset_include_NEI, load_fever_dataset
+from utils.load_fever_dataset import load_fever_dataset_exclude_NEI, load_fever_dataset_include_NEI, load_fever_dataset
 
 dev_df = load_fever_dataset_exclude_NEI('dataset/shared_task_dev.jsonl')
 

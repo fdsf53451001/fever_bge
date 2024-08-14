@@ -18,7 +18,7 @@ hyperparameters = Hyperparameters()
 # Load Data
 def load_data():
     raw_dataset = DatasetDict()
-    df = pd.read_json("verify/train_processed.jsonl", lines=True)
+    df = pd.read_json("verify/dataset/created/train_processed.jsonl", lines=True)
     dataset = Dataset.from_pandas(df)
     # dataset = dataset.shuffle(seed=42)
     dataset_tmp1 = dataset.train_test_split(test_size=0.2)  # Split into train 80% and the rest 20%
@@ -187,7 +187,7 @@ def test():
     datasets, testset_df = load_data_testset_only()
 
     # "bert-base-uncased"、"roberta-base"、"bert-large-uncased"
-    model_path = "temp/fineTune_roberta-base.ckpt_1tn"
+    model_path = "verify_model/fineTune_roberta-base.ckpt"
     method_model = f"fineTune_{model_path}"
 
     # BertFineTune

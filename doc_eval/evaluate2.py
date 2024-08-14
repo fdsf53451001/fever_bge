@@ -2,10 +2,8 @@ import torch
 import re
 from tqdm import tqdm
 
-
 pred_file = open('doc_eval/result/devset_evidence_rerank_20.jsonl', 'r', encoding='utf-8')
 gold_file = open('doc_eval/result/devset_doc_gold.jsonl', 'r', encoding='utf-8')
-
 
 precision = []
 recall = []

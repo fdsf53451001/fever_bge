@@ -2,7 +2,7 @@ import json
 import tqdm
 import pandas as pd
 
-from load_fever_dataset import load_fever_dataset, load_fever_dataset_exclude_NEI
+from ..utils.load_fever_dataset import load_fever_dataset, load_fever_dataset_exclude_NEI
 
 top_evidenct_amount = 10
 evidence_df = load_fever_dataset('doc_eval/result/devset_evidence_rerank_10.jsonl')

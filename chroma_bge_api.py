@@ -1,15 +1,14 @@
 import json
 import tqdm
-# from cal_embedding import calculate_embedding
-from cal_embedding_bge_en import calculate_docs_embedding, get_embeddings
-from cal_embedding_bge_zh import calculate_docs_embedding_zh, get_embeddings_zh
+from utils.cal_embedding_bge_en import calculate_docs_embedding, get_embeddings
+from utils.cal_embedding_bge_zh import calculate_docs_embedding_zh, get_embeddings_zh
 
 from langchain.vectorstores.chroma import Chroma
 import chromadb
 from chromadb.config import Settings
 
 from fastapi import FastAPI, HTTPException, Body
-from crawler import url_to_text
+from webETL_crawler import url_to_text
 import requests
 
 app = FastAPI()
