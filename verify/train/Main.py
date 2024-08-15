@@ -39,7 +39,7 @@ def load_data():
 
 def load_data_testset_only():
     raw_dataset = DatasetDict()
-    testset_df = pd.read_json("verify/testset_evidences_3doc_nodiff.jsonl", lines=True)
+    testset_df = pd.read_json("verify/dataset/created/testset_evidences_3doc.jsonl", lines=True)
     dataset = Dataset.from_pandas(testset_df)
     # dataset = dataset.shuffle(seed=42)
     raw_dataset['test'] = dataset
@@ -215,10 +215,12 @@ def test():
     label_mapping = {0:"SUPPORTS", 1:"REFUTES", 2:"NOT ENOUGH INFO"}
     predictions, scores = bertFineTune.predictions()
     for i in range(len(predictions)):
-        if testset_df.loc[i, 'predicted_label'] == "":
-            testset_df.loc[i, 'predicted_label'] = label_mapping[int(predictions[i])]
+        # if testset_df.loc[i, 'predicted_label'] == "":
+        #     testset_df.loc[i, 'predicted_label'] = label_mapping[int(predictions[i])]
+        
+        testset_df.loc[i, 'predicted_label'] = label_mapping[int(predictions[i])]
         testset_df.loc[i, 'predicted_score'] = scores[i][predictions[i]]
-    testset_df.to_json("output/testset_with_prediction_3doc_nodiff.jsonl", orient='records', lines=True)
+    testset_df.to_json("output/testset_with_prediction_3doc.jsonl", orient='records', lines=True)
 
 
 if __name__ == '__main__':

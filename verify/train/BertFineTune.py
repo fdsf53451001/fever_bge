@@ -83,7 +83,7 @@ class BertFineTune():
         temp_evidence = []
         evidence_str = ""
         # print(example['evidence'])
-        for evidence in example['evidence']:
+        for evidence in example['evidences']:
             # if len(evidence) == 1:
             #     temp_evidence.append(evidence[0])
             # else:

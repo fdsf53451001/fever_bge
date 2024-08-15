@@ -10,6 +10,11 @@ use bge embedding and reranker to do sentence retrivel for fever dataset
 3. get the final top-k evidence by bge rerank
 4. you can compute strict recall for devset data
 
+# Document Retrieval
+1. run 1_load_wiki_chroma_bge.py
+2. run 2_bge_generate_evidences.py
+3. run 3_bge_rerank.py
+
 # Evidence Retrieval
 在證據檢索階段，我們過濾文件檢索獲得的文件，從中取得證據。  
 分成**訓練階段**與**推論階段**，而訓練階段又分成 **Classifier、Regressor、Contrastive Learning** 三種方法。  
@@ -42,3 +47,6 @@ use bge embedding and reranker to do sentence retrivel for fever dataset
 3. 測試模型效能  
     - 到該階段只需使用 `evaluate.py`，記得到程式裡面改路徑，把 `YOUR_RESULT.jsonl` 改成你的輸出結果。  
     > tips: 這邊不考慮沒有黃金證據的情況。  
+
+# Claim Verification
+1. run verify/train/Main.py
